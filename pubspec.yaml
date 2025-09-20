@@ -56,3 +56,4 @@ flutter:
   generate: false
   assets:
     - res/images/
+    - res/images/icons/
