@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio_request_inspector/dio_request_inspector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +11,8 @@ import 'package:nawy_task/providers/navigation_provider.dart';
 import 'package:nawy_task/providers/property_provider.dart';
 import 'package:nawy_task/providers/results_provider.dart';
 import 'package:nawy_task/providers/search_provider.dart';
+
+import 'common/network/dio_service.dart';
 
 Future<void> mainCommon(ConfigType configType) async {
   const bool isProduction = bool.fromEnvironment('dart.vm.product');
@@ -31,9 +34,19 @@ Future<void> mainCommon(ConfigType configType) async {
 void _runApp(ConfigType configType) {
   switch (configType) {
     case ConfigType.dev:
+      _runAppWithInspector();
     case ConfigType.production:
       runApp(const MyApp(),);
   }
+}
+
+void _runAppWithInspector() {
+  runApp(
+    DioRequestInspectorMain(
+      inspector: dioRequestInspector,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
