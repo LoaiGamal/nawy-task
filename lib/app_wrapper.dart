@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nawy_task/common/base/my_app_images.dart';
 import 'package:nawy_task/common/base/route_manager.dart';
 import 'package:nawy_task/common/base/theme.dart';
 
@@ -43,6 +45,12 @@ class _AppWrapperState extends State<AppWrapper> {
       case RouteManager.results:
         _currentIndex = 0; // Keep Explore selected when on results
         break;
+      case RouteManager.updates:
+        _currentIndex = 1; // Set Updates tab as selected
+        break;
+      case RouteManager.more:
+        _currentIndex = 3; // Set Updates tab as selected
+        break;
       default:
         _currentIndex = 0;
     }
@@ -82,21 +90,53 @@ class _AppWrapperState extends State<AppWrapper> {
         ),
         currentIndex: _currentIndex,
         onTap: (index) => _onBottomNavTap(index),
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
+            icon: SvgPicture.asset(
+              MyAppImages.icSearch,
+              colorFilter: ColorFilter.mode(
+                _currentIndex == 0 
+                  ? MyAppTheme.instance.orangeColor 
+                  : MyAppTheme.instance.grayColor,
+                BlendMode.srcIn,
+              ),
+            ),
             label: 'Explore',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view),
+            icon: SvgPicture.asset(
+              MyAppImages.icUpdates,
+              colorFilter: ColorFilter.mode(
+                _currentIndex == 1 
+                  ? MyAppTheme.instance.orangeColor 
+                  : MyAppTheme.instance.grayColor,
+                BlendMode.srcIn,
+              ),
+            ),
             label: 'Updates',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
+            icon: SvgPicture.asset(
+              MyAppImages.icFavorite,
+              colorFilter: ColorFilter.mode(
+                _currentIndex == 2 
+                  ? MyAppTheme.instance.orangeColor 
+                  : MyAppTheme.instance.grayColor,
+                BlendMode.srcIn,
+              ),
+            ),
             label: 'Favorites',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.more_horiz),
+            icon: SvgPicture.asset(
+              MyAppImages.icMore,
+              colorFilter: ColorFilter.mode(
+                _currentIndex == 3 
+                  ? MyAppTheme.instance.orangeColor 
+                  : MyAppTheme.instance.grayColor,
+                BlendMode.srcIn,
+              ),
+            ),
             label: 'More',
           ),
         ],
@@ -110,13 +150,13 @@ class _AppWrapperState extends State<AppWrapper> {
         context.go(RouteManager.search);
         break;
       case 1:
-        // Navigate to Updates
+        context.go(RouteManager.updates);
         break;
       case 2:
         // Navigate to Favorites
         break;
       case 3:
-        // Navigate to More
+        context.go(RouteManager.more);
         break;
     }
   }

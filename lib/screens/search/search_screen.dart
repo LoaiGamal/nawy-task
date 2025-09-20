@@ -158,8 +158,8 @@ class _SearchScreenState extends State<SearchScreen> {
             style: TextStyle(
               color: Colors.white,
               fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1.25,
             ),
           ),
         ),

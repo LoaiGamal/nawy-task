@@ -41,6 +41,8 @@ dependencies:
   #Local Storage
   flutter_secure_storage: ^4.2.1
 
+  url_launcher: ^6.3.1
+
 
 dev_dependencies:
   flutter_test:
@@ -55,5 +57,5 @@ flutter:
   uses-material-design: true
   generate: false
   assets:
-    - res/images/
     - res/images/icons/
+    - res/images/

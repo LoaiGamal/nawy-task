@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:nawy_task/app_wrapper.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nawy_task/common/base/base_screen/base_screen.dart';
-import 'package:nawy_task/common/base/route_manager.dart';
+import 'package:nawy_task/common/base/my_app_images.dart';
 import 'package:nawy_task/common/base/theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ResultsScreen extends StatefulWidget {
   const ResultsScreen({super.key});
@@ -27,19 +27,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
       ),
       actions: [
         IconButton(
-          icon: Icon(
-            Icons.filter_list,
-            color: MyAppTheme.instance.grayColor,
-            size: 24.sp,
-          ),
+          icon: SvgPicture.asset(MyAppImages.icFilter),
           onPressed: () => _showFilterOptions(),
         ),
         IconButton(
-          icon: Icon(
-            Icons.sort,
-            color: MyAppTheme.instance.grayColor,
-            size: 24.sp,
-          ),
+          icon: SvgPicture.asset(MyAppImages.icSort),
           onPressed: () => _showSortOptions(),
         ),
       ],
@@ -87,7 +79,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              selected: index == 0, // First chip selected by default
+              selected: index == 0,
+              // First chip selected by default
               onSelected: (selected) {
                 setState(() {
                   // Handle filter selection
@@ -131,8 +124,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
             title,
             style: TextStyle(
               fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? MyAppTheme.instance.blueColor : MyAppTheme.instance.grayColor,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1.25,
+              color: isSelected
+                  ? MyAppTheme.instance.blueColor
+                  : MyAppTheme.instance.grayColor,
             ),
           ),
           SizedBox(height: 8.h),
@@ -140,7 +136,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
             height: 3.h,
             width: title.length * 8.w,
             decoration: BoxDecoration(
-              color: isSelected ? MyAppTheme.instance.blueColor : Colors.transparent,
+              color: isSelected
+                  ? MyAppTheme.instance.blueColor
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(2.r),
             ),
           ),
@@ -152,11 +150,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Widget _buildResultsCount() {
     return Text(
       '450 results',
-      style: TextStyle(
-        fontSize: 14.sp,
-        color: MyAppTheme.instance.grayColor,
-        fontWeight: FontWeight.w500,
-      ),
+      style: MyAppTheme.instance.hintTextStyle().copyWith(color: Colors.black),
     );
   }
 
@@ -199,6 +193,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 _buildLocationSection(),
                 SizedBox(height: 12.h),
                 _buildPropertySpecs(),
+                SizedBox(height: 12.h),
+                _contactOptionRow(),
               ],
             ),
           ),
@@ -235,20 +231,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
         Expanded(
           child: Text(
             'Serviced apartment',
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: MyAppTheme.instance.primaryColor,
-            ),
+            style: MyAppTheme.instance.titleStyle(),
           ),
         ),
         Text(
           'Delivery 2028',
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: MyAppTheme.instance.grayColor,
-            fontWeight: FontWeight.w500,
-          ),
+          style: MyAppTheme.instance.defaultStyle().copyWith(
+                color: MyAppTheme.instance.grayColor,
+              ),
         ),
       ],
     );
@@ -263,20 +253,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
             children: [
               Text(
                 'EGP 999,999,999',
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: MyAppTheme.instance.orangeColor,
-                ),
+                style: MyAppTheme.instance.largeTextStyle(),
               ),
               SizedBox(height: 4.h),
               Text(
                 '117,493 EGP/month over 7 years',
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: MyAppTheme.instance.grayColor,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: MyAppTheme.instance.detailTextStyle(),
               ),
             ],
           ),
@@ -289,7 +271,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
           },
           child: Icon(
             _isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: _isFavorite ? Colors.red : MyAppTheme.instance.lightBlueColor,
+            color:
+                _isFavorite ? Colors.red : MyAppTheme.instance.lightBlueColor,
             size: 24.sp,
           ),
         ),
@@ -303,20 +286,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
       children: [
         Text(
           'Mountain View - Chillout park',
-          style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: MyAppTheme.instance.primaryColor,
-          ),
+          style: MyAppTheme.instance.defaultStyle(),
         ),
         SizedBox(height: 2.h),
         Text(
           '6th October, Egypt',
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: MyAppTheme.instance.grayColor,
-            fontWeight: FontWeight.w500,
-          ),
+          style: MyAppTheme.instance.defaultStyle(),
         ),
       ],
     );
@@ -324,42 +299,131 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   Widget _buildPropertySpecs() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildSpecItem(Icons.bed, '9'),
+        _buildSpecItem(MyAppImages.icBed, '9'),
         SizedBox(width: 16.w),
-        _buildSpecItem(Icons.bathtub, '9'),
+        _buildSpecItem(MyAppImages.icBath, '9'),
         SizedBox(width: 16.w),
-        _buildSpecItem(Icons.crop_square, '240-320 m²'),
+        _buildSpecItem(MyAppImages.icArea, '240-320 m²'),
       ],
     );
   }
 
-  Widget _buildSpecItem(IconData icon, String value) {
+  Row _contactOptionRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _contactButton(
+            label: 'Zoom',
+            iconPath: MyAppImages.icZoom,
+            width: 9,
+            height: 9,
+            onPressed: () {
+              // Handle Zoom action
+            }),
+        _contactButton(
+          label: 'Call',
+          iconPath: MyAppImages.icCall,
+          width: 16,
+          height: 16,
+          onPressed: () async {
+            try {
+              final Uri phoneUri = Uri.parse('tel:+201121266236');
+              await launchUrl(phoneUri, mode: LaunchMode.externalApplication);
+            } catch (e) {
+              debugPrint('Error launching dialer: $e');
+              // Show user-friendly error message instead of crashing
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Unable to open phone dialer'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
+          },
+        ),
+        _contactButton(
+          label: 'WhatsApp',
+          iconPath: MyAppImages.icWhatsapp,
+          width: 16,
+          height: 16,
+          onPressed: () async {
+            try {
+              const String url = 'https://wa.me/+201121266236?text=';
+              final Uri whatsappUri = Uri.parse(url);
+              await launchUrl(whatsappUri,
+                  mode: LaunchMode.externalApplication);
+            } catch (e) {
+              debugPrint('Error launching WhatsApp: $e');
+              // Show user-friendly error message instead of crashing
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Unable to open WhatsApp'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  OutlinedButton _contactButton(
+      {required String label,
+      required String iconPath,
+      required int width,
+      required int height,
+      required Function() onPressed}) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: SvgPicture.asset(
+        iconPath,
+        width: width.w,
+        height: height.h,
+      ),
+      label: Text(
+        label,
+        style: MyAppTheme.instance.hintTextStyle().copyWith(
+            fontWeight: FontWeight.w700, color: MyAppTheme.instance.blueColor),
+      ),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: MyAppTheme.instance.blueColor),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24.r),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      ),
+    );
+  }
+
+  Widget _buildSpecItem(String iconPath, String value) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 16.sp,
-          color: MyAppTheme.instance.grayColor,
+        SvgPicture.asset(
+          iconPath,
+          width: 22.w,
+          height: 22.h,
         ),
         SizedBox(width: 4.w),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: MyAppTheme.instance.grayColor,
-            fontWeight: FontWeight.w500,
-          ),
+          style: MyAppTheme.instance.detailTextStyle().copyWith(color: MyAppTheme.instance.primaryColor),
         ),
       ],
     );
   }
-
 
   void _showFilterOptions() {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
+        width: double.infinity,
         padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -384,6 +448,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
+        width: double.infinity,
         padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -403,5 +468,4 @@ class _ResultsScreenState extends State<ResultsScreen> {
       ),
     );
   }
-
 }
