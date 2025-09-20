@@ -1,27 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nawy_task/home_screen.dart';
+import 'package:nawy_task/widgets/common/app_wrapper.dart';
+import 'package:nawy_task/screens/more/more_screen.dart';
+import 'package:nawy_task/screens/search/search_screen.dart';
+import 'package:nawy_task/screens/results/results_screen.dart';
+import 'package:nawy_task/screens/updates/updates_screen.dart';
 
 class RouteManager {
-  static const String home = '/home';
-  static const String profile = '/profile';
+  static const String search = '/search';
+  static const String results = '/results';
+  static const String updates = '/updates';
+  static const String more = '/more';
 
   static GoRouter router = GoRouter(
-    initialLocation: home,
+    initialLocation: search,
     routes: <RouteBase>[
       GoRoute(
-        path: home,
+        path: search,
         builder: (BuildContext context, GoRouterState state) {
-          return const MyHomePage(title: 'title');
+          return const AppWrapper(
+            currentRoute: search,
+            child: SearchScreen(),
+          );
         },
-        routes: <RouteBase>[
-          GoRoute(
-            path: profile,
-            builder: (BuildContext context, GoRouterState state) {
-              return const SizedBox();
-            },
-          ),
-        ],
+      ),
+      GoRoute(
+        path: results,
+        builder: (BuildContext context, GoRouterState state) {
+          return const AppWrapper(
+            currentRoute: results,
+            child: ResultsScreen(),
+          );
+        },
+      ),
+      GoRoute(
+        path: updates,
+        builder: (BuildContext context, GoRouterState state) {
+          return const AppWrapper(
+            currentRoute: updates,
+            child: UpdatesScreen(),
+          );
+        },
+      ),
+      GoRoute(
+        path: more,
+        builder: (BuildContext context, GoRouterState state) {
+          return const AppWrapper(
+            currentRoute: more,
+            child: MoreScreen(),
+          );
+        },
       ),
     ],
   );

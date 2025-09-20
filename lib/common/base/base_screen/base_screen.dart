@@ -67,7 +67,6 @@ class BaseScreen extends StatelessWidget {
         bottom: bottom,
         backgroundColor: backgroundColor ?? Colors.white,
         elevation: 0,
-        centerTitle: true,
       )
           : null,
       drawer: drawer,
