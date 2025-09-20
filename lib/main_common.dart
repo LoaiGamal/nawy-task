@@ -1,16 +1,10 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:ui';
 
-import 'package:dio_request_inspector/dio_request_inspector.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nawy_task/common/base/global.dart';
 import 'package:nawy_task/common/base/route_manager.dart';
-import 'package:nested/nested.dart';
-import 'package:provider/provider.dart';
 
 Future<void> mainCommon(ConfigType configType) async {
   const bool isProduction = bool.fromEnvironment('dart.vm.product');
@@ -26,47 +20,16 @@ Future<void> mainCommon(ConfigType configType) async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
   );
-  // await Network().initAppInterceptors();
   _runApp(configType);
 }
 
 void _runApp(ConfigType configType) {
   switch (configType) {
     case ConfigType.dev:
-      // _runAppWithInspector();
     case ConfigType.production:
-      // runApp(appWidget);
       runApp(const MyApp(),);
   }
 }
-
-// void _runAppWithInspector() {
-//   runApp(
-//     DioRequestInspectorMain(
-//       inspector: dioRequestInspector,
-//       child: appWidget,
-//     ),
-//   );
-// }
-
-// Widget appWidget = MultiProvider(
-//   providers: <SingleChildWidget>[
-//     // ChangeNotifierProvider<UserOutOfZoneProvider>(
-//     //   create: (BuildContext context) => UserOutOfZoneProvider(),
-//     // ),
-//   ],
-//   child: MultiBlocProvider(
-//     providers: <SingleChildWidget>[
-//       // BlocProvider<FoodCartCubit>(
-//       //   create: (BuildContext context) => getIt<FoodCartCubit>(),
-//       // ),
-//     ],
-//     child: const MyApp(),
-//   ),
-// );
-
-// final RouteObserver<PageRoute<dynamic>> routeObserver =
-// RouteObserver<PageRoute<dynamic>>();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

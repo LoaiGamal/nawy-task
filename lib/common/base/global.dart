@@ -36,8 +36,6 @@ class AppConfig {
   // Toggle this for testing Crashlytics in your app locally.
   bool kTestingCrashlytics = true;
 
-  bool hasHuaweiServicesOnly = false;
-
   Future<bool> init(ConfigType configType) async {
     this.configType = configType;
     await LocalStorage.instance.initSecureStorage();
