@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nawy_task/app_wrapper.dart';
+import 'package:nawy_task/widgets/common/app_wrapper.dart';
 import 'package:nawy_task/screens/more/more_screen.dart';
 import 'package:nawy_task/screens/search/search_screen.dart';
 import 'package:nawy_task/screens/results/results_screen.dart';

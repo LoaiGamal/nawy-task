@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:nawy_task/common/base/base_screen/base_screen.dart';
 import 'package:nawy_task/common/base/route_manager.dart';
+import 'package:nawy_task/providers/property_provider.dart';
+import 'package:nawy_task/providers/search_provider.dart';
+import 'package:nawy_task/services/search_service.dart';
 import 'package:nawy_task/widgets/common/filter_option_widget.dart';
 import 'package:nawy_task/widgets/common/modal_bottom_sheet_widget.dart';
 import 'package:nawy_task/widgets/common/option_list_tile_widget.dart';
@@ -18,14 +22,13 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  RangeValues _roomRange = const RangeValues(1, 4);
-  String _selectedPrice = 'Any';
-
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    // Initialize property data when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PropertyProvider>().initializeMockData();
+    });
   }
 
   @override
@@ -49,34 +52,44 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchField() {
-    return SearchFieldWidget(
-      controller: _searchController,
-      hintText: 'Area, Compound, Developer',
-      prefixIcon: Icons.search,
+    return Consumer<SearchProvider>(
+      builder: (context, searchProvider, child) {
+        return SearchFieldWidget(
+          controller: searchProvider.searchController,
+          hintText: 'Area, Compound, Developer',
+          prefixIcon: Icons.search,
+        );
+      },
     );
   }
 
   Widget _buildPriceFilter() {
-    return FilterOptionWidget(
-      title: 'Price',
-      selectedValue: _selectedPrice,
-      onTap: () => _showPriceOptions(),
+    return Consumer<SearchProvider>(
+      builder: (context, searchProvider, child) {
+        return FilterOptionWidget(
+          title: 'Price',
+          selectedValue: searchProvider.selectedPrice,
+          onTap: () => _showPriceOptions(),
+        );
+      },
     );
   }
 
   Widget _buildRoomsFilter() {
-    return RangeSliderWidget(
-      title: 'Rooms',
-      values: _roomRange,
-      min: 1,
-      max: 4,
-      divisions: 3,
-      onChanged: (RangeValues values) {
-        setState(() {
-          _roomRange = values;
-        });
+    return Consumer<SearchProvider>(
+      builder: (context, searchProvider, child) {
+        return RangeSliderWidget(
+          title: 'Rooms',
+          values: searchProvider.roomRange,
+          min: 1,
+          max: 4,
+          divisions: 3,
+          onChanged: (RangeValues values) {
+            searchProvider.updateRoomRange(values);
+          },
+          valueFormatter: (values) => '${values.start.round()} ~ ${values.end.round()}+ rooms',
+        );
       },
-      valueFormatter: (values) => '${values.start.round()} ~ ${values.end.round()}+ rooms',
     );
   }
 
@@ -108,19 +121,24 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildPriceOption(String price) {
-    return OptionListTileWidget(
-      title: price,
-      isSelected: _selectedPrice == price,
-      onTap: () {
-        setState(() {
-          _selectedPrice = price;
-        });
-        Navigator.pop(context);
+    return Consumer<SearchProvider>(
+      builder: (context, searchProvider, child) {
+        return OptionListTileWidget(
+          title: price,
+          isSelected: searchProvider.selectedPrice == price,
+          onTap: () {
+            searchProvider.updateSelectedPrice(price);
+            Navigator.pop(context);
+          },
+        );
       },
     );
   }
 
   void _showResults() {
+    // Perform search with current filters
+    SearchService.performSearch(context);
+    // Navigate to results
     context.push(RouteManager.results);
   }
 

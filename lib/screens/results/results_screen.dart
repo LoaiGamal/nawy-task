@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:nawy_task/common/base/base_screen/base_screen.dart';
 import 'package:nawy_task/common/base/my_app_images.dart';
+import 'package:nawy_task/providers/property_provider.dart';
+import 'package:nawy_task/providers/results_provider.dart';
 import 'package:nawy_task/widgets/common/filter_chip_list_widget.dart';
 import 'package:nawy_task/widgets/common/modal_bottom_sheet_widget.dart';
+import 'package:nawy_task/widgets/common/option_list_tile_widget.dart';
 import 'package:nawy_task/widgets/common/primary_button_widget.dart';
 import 'package:nawy_task/widgets/common/results_count_widget.dart';
 import 'package:nawy_task/widgets/common/tab_selector_widget.dart';
@@ -18,9 +22,6 @@ class ResultsScreen extends StatefulWidget {
 }
 
 class _ResultsScreenState extends State<ResultsScreen> {
-  int _selectedTabIndex = 0;
-  int _selectedFilterIndex = 0;
-  bool _isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
@@ -59,60 +60,79 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildFilterChips() {
-    final filters = [
-      'City, Governorate',
-      'Compound name',
-      'Apartment',
-      'Villa',
-      'Townhouse',
-    ];
+    return Consumer<ResultsProvider>(
+      builder: (context, resultsProvider, child) {
+        final filters = resultsProvider.allFilterTypes
+            .map((type) => resultsProvider.getFilterTypeText(type))
+            .toList();
 
-    return FilterChipListWidget(
-      filters: filters,
-      selectedIndex: _selectedFilterIndex,
-      onFilterSelected: (index) {
-        setState(() {
-          _selectedFilterIndex = index;
-        });
+        return FilterChipListWidget(
+          filters: filters,
+          selectedIndex: resultsProvider.selectedFilterIndex,
+          onFilterSelected: (index) {
+            resultsProvider.updateSelectedFilter(index);
+          },
+        );
       },
     );
   }
 
   Widget _buildContentTabs() {
-    return TabSelectorWidget(
-      tabs: const ['PROPERTIES', 'COMPOUNDS'],
-      selectedIndex: _selectedTabIndex,
-      onTabSelected: (index) {
-        setState(() {
-          _selectedTabIndex = index;
-        });
+    return Consumer<ResultsProvider>(
+      builder: (context, resultsProvider, child) {
+        return TabSelectorWidget(
+          tabs: const ['PROPERTIES', 'COMPOUNDS'],
+          selectedIndex: resultsProvider.selectedTabIndex,
+          onTabSelected: (index) {
+            resultsProvider.updateSelectedTab(index);
+          },
+        );
       },
     );
   }
 
   Widget _buildResultsCount() {
-    return const ResultsCountWidget(count: 450);
+    return Consumer<PropertyProvider>(
+      builder: (context, propertyProvider, child) {
+        return ResultsCountWidget(count: propertyProvider.filteredProperties.length);
+      },
+    );
   }
 
   Widget _buildPropertyList() {
-    return ListView.builder(
-      itemCount: 10, // Mock data
-      itemBuilder: (context, index) {
-        return PropertyCardWidget(
-          title: 'Serviced apartment',
-          deliveryDate: 'Delivery 2028',
-          price: 'EGP 999,999,999',
-          monthlyPayment: '117,493 EGP/month over 7 years',
-          location: 'Mountain View - Chillout park',
-          address: '6th October, Egypt',
-          bedrooms: '9',
-          bathrooms: '9',
-          area: '240-320 m²',
-          isFavorite: _isFavorite,
-          onFavoriteToggle: () {
-            setState(() {
-              _isFavorite = !_isFavorite;
-            });
+    return Consumer<PropertyProvider>(
+      builder: (context, propertyProvider, child) {
+        if (propertyProvider.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (propertyProvider.error != null) {
+          return Center(
+            child: Text('Error: ${propertyProvider.error}'),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: propertyProvider.filteredProperties.length,
+          itemBuilder: (context, index) {
+            final property = propertyProvider.filteredProperties[index];
+            return PropertyCardWidget(
+              title: property.title,
+              deliveryDate: property.deliveryDate,
+              price: property.price,
+              monthlyPayment: property.monthlyPayment,
+              location: property.location,
+              address: property.address,
+              bedrooms: property.bedrooms,
+              bathrooms: property.bathrooms,
+              area: property.area,
+              isFavorite: propertyProvider.isFavorite(property.id),
+              onFavoriteToggle: () {
+                propertyProvider.toggleFavorite(property.id);
+              },
+            );
           },
         );
       },
@@ -135,12 +155,22 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   void _showSortOptions() {
+    final resultsProvider = context.read<ResultsProvider>();
+    
     ModalBottomSheetWidget.show(
       context: context,
       title: 'Sort Options',
-      children: [
-        // Add sort options here
-      ],
+      children: resultsProvider.allSortOptions.map((option) {
+        return OptionListTileWidget(
+          title: resultsProvider.getSortOptionText(option),
+          isSelected: resultsProvider.selectedSortOption == option,
+          onTap: () {
+            resultsProvider.updateSortOption(option);
+            context.read<PropertyProvider>().sortProperties(resultsProvider.getSortOptionText(option));
+            Navigator.pop(context);
+          },
+        );
+      }).toList(),
       actionButton: PrimaryButtonWidget(
         text: 'Apply Sort',
         onPressed: () => Navigator.pop(context),

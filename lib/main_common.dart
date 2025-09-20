@@ -3,8 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:nawy_task/common/base/global.dart';
 import 'package:nawy_task/common/base/route_manager.dart';
+import 'package:nawy_task/providers/navigation_provider.dart';
+import 'package:nawy_task/providers/property_provider.dart';
+import 'package:nawy_task/providers/results_provider.dart';
+import 'package:nawy_task/providers/search_provider.dart';
 
 Future<void> mainCommon(ConfigType configType) async {
   const bool isProduction = bool.fromEnvironment('dart.vm.product');
@@ -65,7 +70,17 @@ class MyApp extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return ScreenUtilInit(
           designSize: const Size(375, 812),
-          builder: (BuildContext context, Widget? child) => materialApp,
+          builder: (BuildContext context, Widget? child) {
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider(create: (_) => NavigationProvider()),
+                ChangeNotifierProvider(create: (_) => SearchProvider()),
+                ChangeNotifierProvider(create: (_) => ResultsProvider()),
+                ChangeNotifierProvider(create: (_) => PropertyProvider()),
+              ],
+              child: materialApp,
+            );
+          },
         );
       },
     );
