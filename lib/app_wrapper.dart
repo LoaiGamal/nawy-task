@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nawy_task/common/base/my_app_images.dart';
 import 'package:nawy_task/common/base/route_manager.dart';
-import 'package:nawy_task/common/base/theme.dart';
+import 'package:nawy_task/widgets/navigation/bottom_navigation_bar_widget.dart';
 
 class AppWrapper extends StatefulWidget {
   final Widget child;
@@ -60,86 +57,9 @@ class _AppWrapperState extends State<AppWrapper> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: _buildBottomNavigationBar(),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: MyAppTheme.instance.lightGrayColor.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-      ),
-      child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: MyAppTheme.instance.orangeColor,
-        unselectedItemColor: MyAppTheme.instance.grayColor,
-        selectedLabelStyle: TextStyle(
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w500,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w400,
-        ),
+      bottomNavigationBar: BottomNavigationBarWidget(
         currentIndex: _currentIndex,
-        onTap: (index) => _onBottomNavTap(index),
-        items: [
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              MyAppImages.icSearch,
-              colorFilter: ColorFilter.mode(
-                _currentIndex == 0 
-                  ? MyAppTheme.instance.orangeColor 
-                  : MyAppTheme.instance.grayColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              MyAppImages.icUpdates,
-              colorFilter: ColorFilter.mode(
-                _currentIndex == 1 
-                  ? MyAppTheme.instance.orangeColor 
-                  : MyAppTheme.instance.grayColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            label: 'Updates',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              MyAppImages.icFavorite,
-              colorFilter: ColorFilter.mode(
-                _currentIndex == 2 
-                  ? MyAppTheme.instance.orangeColor 
-                  : MyAppTheme.instance.grayColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              MyAppImages.icMore,
-              colorFilter: ColorFilter.mode(
-                _currentIndex == 3 
-                  ? MyAppTheme.instance.orangeColor 
-                  : MyAppTheme.instance.grayColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            label: 'More',
-          ),
-        ],
+        onTap: _onBottomNavTap,
       ),
     );
   }

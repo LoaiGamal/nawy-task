@@ -3,7 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nawy_task/common/base/base_screen/base_screen.dart';
 import 'package:nawy_task/common/base/route_manager.dart';
-import 'package:nawy_task/common/base/theme.dart';
+import 'package:nawy_task/widgets/common/filter_option_widget.dart';
+import 'package:nawy_task/widgets/common/modal_bottom_sheet_widget.dart';
+import 'package:nawy_task/widgets/common/option_list_tile_widget.dart';
+import 'package:nawy_task/widgets/common/primary_button_widget.dart';
+import 'package:nawy_task/widgets/common/range_slider_widget.dart';
+import 'package:nawy_task/widgets/common/search_field_widget.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -44,161 +49,68 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchField() {
-    return Container(
-      height: 48.h,
-      decoration: BoxDecoration(
-        border: Border.all(color: MyAppTheme.instance.lightGrayColor.withOpacity(0.3)),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: TextField(
-        controller: _searchController,
-        decoration: InputDecoration(
-          hintText: 'Area, Compound, Developer',
-          hintStyle: MyAppTheme.instance.hintTextStyle(),
-          prefixIcon: Icon(
-            Icons.search,
-            color: MyAppTheme.instance.blueColor,
-            size: 20.sp,
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        ),
-      ),
+    return SearchFieldWidget(
+      controller: _searchController,
+      hintText: 'Area, Compound, Developer',
+      prefixIcon: Icons.search,
     );
   }
 
   Widget _buildPriceFilter() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Price',
-          style: MyAppTheme.instance.titleStyle(),
-        ),
-        SizedBox(height: 8.h),
-        GestureDetector(
-          onTap: () => _showPriceOptions(),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 12.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _selectedPrice,
-                  style: MyAppTheme.instance.detailTextStyle(),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: MyAppTheme.instance.lightGrayColor,
-                  size: 20.sp,
-                ),
-              ],
-            ),
-          ),
-        ),
-        Divider(
-          color: MyAppTheme.instance.lightGrayColor.withOpacity(0.2),
-          thickness: 1,
-        ),
-      ],
+    return FilterOptionWidget(
+      title: 'Price',
+      selectedValue: _selectedPrice,
+      onTap: () => _showPriceOptions(),
     );
   }
 
   Widget _buildRoomsFilter() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Rooms',
-              style: MyAppTheme.instance.titleStyle(),
-            ),
-            Text(
-              '${_roomRange.start.round()} ~ ${_roomRange.end.round()}+ rooms',
-              style: MyAppTheme.instance.detailTextStyle(),
-            ),
-          ],
-        ),
-        SizedBox(height: 16.h),
-        RangeSlider(
-          values: _roomRange,
-          min: 1,
-          max: 4,
-          divisions: 3,
-          activeColor: MyAppTheme.instance.blueColor,
-          inactiveColor: MyAppTheme.instance.lightBlueColor,
-          onChanged: (RangeValues values) {
-            setState(() {
-              _roomRange = values;
-            });
-          },
-        ),
-      ],
+    return RangeSliderWidget(
+      title: 'Rooms',
+      values: _roomRange,
+      min: 1,
+      max: 4,
+      divisions: 3,
+      onChanged: (RangeValues values) {
+        setState(() {
+          _roomRange = values;
+        });
+      },
+      valueFormatter: (values) => '${values.start.round()} ~ ${values.end.round()}+ rooms',
     );
   }
 
   Widget _buildShowResultsButton() {
     return Center(
-      child: SizedBox(
-        width: double.infinity,
-        height: 48.h,
-        child: ElevatedButton(
-          onPressed: () => _showResults(),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: MyAppTheme.instance.blueColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            elevation: 0,
-          ),
-          child: Text(
-            'SHOW RESULTS',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 1.25,
-            ),
-          ),
-        ),
+      child: PrimaryButtonWidget(
+        text: 'SHOW RESULTS',
+        onPressed: () => _showResults(),
       ),
     );
   }
 
 
   void _showPriceOptions() {
-    showModalBottomSheet(
+    final priceOptions = [
+      'Any',
+      'Under 500K',
+      '500K - 1M',
+      '1M - 2M',
+      '2M - 5M',
+      'Above 5M',
+    ];
+
+    ModalBottomSheetWidget.show(
       context: context,
-      builder: (context) => Container(
-        padding: EdgeInsets.all(20.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Select Price Range',
-              style: MyAppTheme.instance.titleStyle(),
-            ),
-            SizedBox(height: 20.h),
-            _buildPriceOption('Any'),
-            _buildPriceOption('Under 500K'),
-            _buildPriceOption('500K - 1M'),
-            _buildPriceOption('1M - 2M'),
-            _buildPriceOption('2M - 5M'),
-            _buildPriceOption('Above 5M'),
-          ],
-        ),
-      ),
+      title: 'Select Price Range',
+      children: priceOptions.map((price) => _buildPriceOption(price)).toList(),
     );
   }
 
   Widget _buildPriceOption(String price) {
-    return ListTile(
-      title: Text(price, style: MyAppTheme.instance.defaultStyle()),
-      trailing: _selectedPrice == price
-          ? Icon(Icons.check, color: MyAppTheme.instance.blueColor)
-          : null,
+    return OptionListTileWidget(
+      title: price,
+      isSelected: _selectedPrice == price,
       onTap: () {
         setState(() {
           _selectedPrice = price;
